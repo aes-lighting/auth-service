@@ -100,7 +100,7 @@ def get_db():
     return conn
 
 def seed_admin():
-    """Seed initial admin user if ADMIN_EMAIL and ADMIN_PASSWORD are set."""
+    """Seed/recreate admin user with ADMIN_EMAIL and ADMIN_PASSWORD."""
     if not ADMIN_EMAIL or not ADMIN_PASSWORD:
         log.info("No ADMIN_EMAIL/ADMIN_PASSWORD set; skipping admin seeding.")
         return
@@ -109,10 +109,8 @@ def seed_admin():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT id FROM users WHERE email = ?", (ADMIN_EMAIL,))
-        if cursor.fetchone():
-            log.info(f"Admin user {ADMIN_EMAIL} already exists.")
-            return
+        # Delete any existing admin user with this email to ensure fresh credentials
+        cursor.execute("DELETE FROM users WHERE email = ?", (ADMIN_EMAIL,))
 
         password_hash = generate_password_hash(ADMIN_PASSWORD)
         now = datetime.now().isoformat()
@@ -123,7 +121,7 @@ def seed_admin():
         """, (ADMIN_EMAIL, "Admin", password_hash, "admin", now, now))
 
         conn.commit()
-        log.info(f"Seeded admin user: {ADMIN_EMAIL}")
+        log.info(f"Seeded/refreshed admin user: {ADMIN_EMAIL}")
     except Exception as e:
         log.error(f"Error seeding admin: {e}")
     finally:
