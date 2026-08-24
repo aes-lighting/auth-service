@@ -290,10 +290,12 @@ def health_check():
     """Health check endpoint."""
     return jsonify({"status": "healthy"}), 200
 
-# ===== Startup =====
+# ===== Initialize on Startup =====
+log.info("Starting AES Auth Service...")
+init_db()
+seed_admin()
+log.info(f"Listening on port {PORT}")
+
+# ===== Main =====
 if __name__ == "__main__":
-    log.info("Starting AES Auth Service...")
-    init_db()
-    seed_admin()
-    log.info(f"Listening on port {PORT}")
     app.run(host="0.0.0.0", port=PORT, debug=False)
