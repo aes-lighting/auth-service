@@ -290,12 +290,21 @@ def health_check():
     """Health check endpoint."""
     return jsonify({"status": "healthy"}), 200
 
-# ===== Initialize on Startup =====
-log.info("Starting AES Auth Service...")
-init_db()
-seed_admin()
-log.info(f"Listening on port {PORT}")
+# ===== Initialize on App Creation =====
+@app.before_request
+def before_first_request():
+    """Initialize database on first request."""
+    if not hasattr(app, 'initialized'):
+        log.info("Starting AES Auth Service...")
+        init_db()
+        seed_admin()
+        log.info(f"Listening on port {PORT}")
+        app.initialized = True
 
 # ===== Main =====
 if __name__ == "__main__":
+    log.info("Starting AES Auth Service...")
+    init_db()
+    seed_admin()
+    log.info(f"Listening on port {PORT}")
     app.run(host="0.0.0.0", port=PORT, debug=False)
