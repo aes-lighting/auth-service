@@ -39,8 +39,8 @@ import sqlite3
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_URL = os.environ.get("DATABASE_URL", os.path.join(BASE_DIR, "auth.db"))
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
-ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@aes-energy.com")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "aes")
 PORT = int(os.environ.get("PORT", 5000))
 
 if not FLASK_SECRET_KEY:
