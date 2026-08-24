@@ -32,6 +32,7 @@ from datetime import datetime
 from functools import wraps
 
 from flask import Flask, request, jsonify, session
+from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
@@ -59,6 +60,9 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,  # Only send over HTTPS in production
     PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 30,  # 30 days
 )
+
+# ===== CORS Setup =====
+CORS(app, supports_credentials=True)
 
 # ===== Logging =====
 logging.basicConfig(
