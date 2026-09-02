@@ -367,6 +367,38 @@ def admin_list_users_header():
         log.error(f"Error listing users: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/auth/admin/users/<int:user_id>", methods=["DELETE"])
+def admin_delete_user_header(user_id):
+    """Delete a user (header-based auth for microservices)."""
+    try:
+        # Check Authorization header
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Authorization required"}), 401
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Get user info before deleting
+        cursor.execute("SELECT email, name FROM users WHERE id = ?", (user_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            return jsonify({"error": "User not found"}), 404
+        
+        # Delete the user
+        cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+        
+        log.info(f"User deleted: {row['email']}")
+        
+        return jsonify({"message": f"User {row['email']} deleted"}), 200
+    except Exception as e:
+        log.error(f"Error deleting user: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/api/auth/health", methods=["GET"])
 def health_check():
     """Health check endpoint."""
