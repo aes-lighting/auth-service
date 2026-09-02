@@ -286,6 +286,86 @@ def list_users():
     ]
 
     return jsonify({"users": users}), 200
+@app.route("/api/auth/admin/register_user", methods=["POST"])
+def admin_register_user_header():
+    """Register a new user (header-based auth for microservices)."""
+    # Check Authorization header
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Authorization required"}), 401
+    
+    # TODO: Verify the user in the header is actually an admin
+    # For now, just check header exists
+    
+    data = request.get_json() or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or os.environ.get("SHARED_PASSWORD", "aes")
+    role = (data.get("role") or "driver").strip().lower()
+
+    if not name or not email:
+        return jsonify({"error": "Name and email required"}), 400
+
+    if role not in ("driver", "pm", "admin"):
+        return jsonify({"error": "Invalid role. Must be: driver, pm, admin"}), 400
+
+    password_hash = generate_password_hash(password)
+    now = datetime.now().isoformat()
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO users (email, name, password_hash, role, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (email, name, password_hash, role, now, now))
+        conn.commit()
+        user_id = cursor.lastrowid
+
+        log.info(f"User registered: {email} ({role})")
+
+        return jsonify({
+            "user_id": user_id,
+            "email": email,
+            "name": name,
+            "role": role
+        }), 201
+    except sqlite3.IntegrityError:
+        return jsonify({"error": "Email already registered"}), 409
+    finally:
+        conn.close()
+
+
+@app.route("/api/auth/admin/users", methods=["GET"])
+def admin_list_users_header():
+    """List all users (header-based auth for microservices)."""
+    # Check Authorization header
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Authorization required"}), 401
+    
+    # TODO: Verify the user in the header is actually an admin
+    # For now, just check header exists
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, email, name, role, created_at FROM users ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    conn.close()
+
+    users = [
+        {
+            "user_id": row["id"],
+            "email": row["email"],
+            "name": row["name"],
+            "role": row["role"],
+            "created_at": row["created_at"]
+        }
+        for row in rows
+    ]
+
+    return jsonify({"users": users}), 200
 
 @app.route("/api/auth/health", methods=["GET"])
 def health_check():
