@@ -1,0 +1,14 @@
+# Valid fixture graph for SHACL gate
+@prefix auth: <https://aes-lighting.com/ns/auth#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<https://aes-lighting.com/ns/auth/fixtures/user/1>
+    a auth:User ;
+    auth:userId 1 ;
+    auth:email "admin@example.com" ;
+    auth:name "Admin" ;
+    auth:roleCode "admin" .
+
+<https://aes-lighting.com/ns/auth/fixtures/session/1>
+    a auth:SessionCredential ;
+    auth:sessionUserId 1 .

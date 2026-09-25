@@ -1,0 +1,10 @@
+# Deliberate reject: invalid role code (must fail SHACL)
+@prefix auth: <https://aes-lighting.com/ns/auth#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<https://aes-lighting.com/ns/auth/fixtures/user/bad-role>
+    a auth:User ;
+    auth:userId 99 ;
+    auth:email "bad@example.com" ;
+    auth:name "Bad" ;
+    auth:roleCode "superuser" .

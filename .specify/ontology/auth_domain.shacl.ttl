@@ -1,0 +1,48 @@
+# Hand-curated SHACL shapes for auth-service fixtures / projections
+@prefix auth: <https://aes-lighting.com/ns/auth#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+<https://aes-lighting.com/ns/auth/shacl>
+    a owl:Ontology ;
+    dct:title "Auth Domain SHACL Shapes" ;
+    owl:versionInfo "0.1.0-baseline" ;
+    owl:imports <https://aes-lighting.com/ns/auth/generated> ,
+                <https://aes-lighting.com/ns/auth/shacl/enums> .
+
+auth:UserShape
+    a sh:NodeShape ;
+    sh:targetClass auth:User ;
+    sh:property [
+        sh:path auth:email ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path auth:name ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property auth:UserRoleCodePropertyShape ;
+    sh:property [
+        sh:path auth:userId ;
+        sh:datatype xsd:integer ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] .
+
+auth:SessionCredentialShape
+    a sh:NodeShape ;
+    sh:targetClass auth:SessionCredential ;
+    sh:property [
+        sh:path auth:sessionUserId ;
+        sh:datatype xsd:integer ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] .

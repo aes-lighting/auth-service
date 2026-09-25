@@ -1,0 +1,9 @@
+# Local ontology validation venv
+.specify/scripts/.venv/
+
+# Runtime
+auth.db
+__pycache__/
+*.pyc
+.env
+.venv/

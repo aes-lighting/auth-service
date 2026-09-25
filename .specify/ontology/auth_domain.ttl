@@ -1,0 +1,16 @@
+# Auth domain catalog — open this in Protégé
+@prefix auth: <https://aes-lighting.com/ns/auth#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+<https://aes-lighting.com/ns/auth>
+    a owl:Ontology ;
+    dct:title "AES Auth Service Domain Ontology" ;
+    dct:creator "auth-service Spec Kit" ;
+    dct:description "Normative for all agents. See .specify/spec.md." ;
+    owl:versionInfo "0.1.0-baseline" ;
+    rdfs:comment "Thin catalog. Imports generated structural TBox and curated axioms." ;
+    owl:imports <https://aes-lighting.com/ns/auth/generated> ,
+                <https://aes-lighting.com/ns/auth/axioms> .

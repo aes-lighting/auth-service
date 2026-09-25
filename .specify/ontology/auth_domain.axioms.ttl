@@ -1,0 +1,134 @@
+# Curated OWL axioms for auth-service
+# Edit in Protégé or as Turtle. Do not regenerate this file.
+@prefix auth: <https://aes-lighting.com/ns/auth#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+<https://aes-lighting.com/ns/auth/axioms>
+    a owl:Ontology ;
+    dct:title "Auth Domain Curated Axioms" ;
+    dct:description "Hand-maintained disjoint surfaces, role individuals, and agent must-nots. HTTP auth correctness remains Flask + SQLite + Werkzeug." ;
+    owl:versionInfo "0.1.0-baseline" ;
+    owl:imports <https://aes-lighting.com/ns/auth/generated> .
+
+#################################################################
+# Delivery surfaces (mutually exclusive)
+#################################################################
+
+auth:PublicAuthSurface
+    a owl:Class ;
+    rdfs:label "PublicAuthSurface" ;
+    rdfs:comment "Unauthenticated or session-establishing public routes (login, health)." .
+
+auth:SessionAdminSurface
+    a owl:Class ;
+    rdfs:label "SessionAdminSurface" ;
+    rdfs:comment "Admin routes gated by Flask session + role=admin." .
+
+auth:BearerAdminSurface
+    a owl:Class ;
+    rdfs:label "BearerAdminSurface" ;
+    rdfs:comment "Machine admin routes under /admin/*. Implemented today as Bearer prefix only; Target is shared-secret validation." .
+
+auth:AiRawAdvice
+    a owl:Class ;
+    rdfs:label "AiRawAdvice" ;
+    rdfs:comment "Unreviewed agent output. Must not become operational auth law or auto-deploy credential policy." .
+
+auth:PublicAuthSurface owl:disjointWith auth:SessionAdminSurface , auth:BearerAdminSurface , auth:AiRawAdvice .
+auth:SessionAdminSurface owl:disjointWith auth:BearerAdminSurface , auth:AiRawAdvice .
+auth:BearerAdminSurface owl:disjointWith auth:AiRawAdvice .
+
+#################################################################
+# Core entity disjointness
+#################################################################
+
+auth:User owl:disjointWith auth:Role , auth:SessionCredential , auth:PublicAuthSurface , auth:SessionAdminSurface , auth:BearerAdminSurface , auth:AiRawAdvice .
+auth:Role owl:disjointWith auth:SessionCredential , auth:PublicAuthSurface , auth:SessionAdminSurface , auth:BearerAdminSurface , auth:AiRawAdvice .
+auth:SessionCredential owl:disjointWith auth:PublicAuthSurface , auth:SessionAdminSurface , auth:BearerAdminSurface , auth:AiRawAdvice .
+
+#################################################################
+# Role class + closed individuals
+#################################################################
+
+auth:Role
+    a owl:Class ;
+    rdfs:label "Role" ;
+    rdfs:comment "Closed RBAC role vocabulary for AES Logistics auth." .
+
+auth:RoleDriver
+    a auth:Role , owl:NamedIndividual ;
+    rdfs:label "driver" ;
+    auth:roleIndividualCode "driver" .
+
+auth:RolePm
+    a auth:Role , owl:NamedIndividual ;
+    rdfs:label "pm" ;
+    auth:roleIndividualCode "pm" .
+
+auth:RoleAdmin
+    a auth:Role , owl:NamedIndividual ;
+    rdfs:label "admin" ;
+    auth:roleIndividualCode "admin" .
+
+auth:roleIndividualCode
+    a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain auth:Role ;
+    rdfs:range xsd:string ;
+    rdfs:label "roleIndividualCode" ;
+    rdfs:comment "Code on Role individuals. User.role column maps to auth:roleCode in generated TBox." .
+
+auth:hasRole
+    a owl:ObjectProperty ;
+    rdfs:domain auth:User ;
+    rdfs:range auth:Role ;
+    rdfs:label "hasRole" .
+
+auth:sessionUserId
+    a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain auth:SessionCredential ;
+    rdfs:range xsd:integer ;
+    rdfs:label "sessionUserId" .
+
+#################################################################
+# Agent / policy markers (annotation-style individuals)
+#################################################################
+
+auth:PolicyNoSecretsInGit
+    a owl:NamedIndividual ;
+    rdfs:label "PolicyNoSecretsInGit" ;
+    rdfs:comment "Never commit FLASK_SECRET_KEY, ADMIN_PASSWORD, SHARED_PASSWORD, or .env." .
+
+auth:PolicyOntologyDoesNotReplaceRuntimeAuth
+    a owl:NamedIndividual ;
+    rdfs:label "PolicyOntologyDoesNotReplaceRuntimeAuth" ;
+    rdfs:comment "SHACL/OWL success is not proof of secure HTTP authentication." .
+
+auth:PolicyNoAutoDeployCredentialPolicy
+    a owl:NamedIndividual ;
+    rdfs:label "PolicyNoAutoDeployCredentialPolicy" ;
+    rdfs:comment "Unreviewed AiRawAdvice must not auto-deploy credential or auth-policy changes." .
+
+auth:PolicyDoNotTreatBearerPrefixAsVerifiedToken
+    a owl:NamedIndividual ;
+    rdfs:label "PolicyDoNotTreatBearerPrefixAsVerifiedToken" ;
+    rdfs:comment "Until Target FR-T01 is Implemented, do not describe Bearer admin as verified token auth." .
+
+auth:PolicyMvpDeferred
+    a owl:NamedIndividual ;
+    rdfs:label "PolicyMvpDeferred" ;
+    rdfs:comment "MVP success criteria remain Deferred until mvp-definition.md is owner-authored." .
+
+auth:HumanOwner
+    a owl:Class ;
+    rdfs:label "HumanOwner" .
+
+auth:CodingAgent
+    a owl:Class ;
+    rdfs:label "CodingAgent" .
+
+auth:HumanOwner owl:disjointWith auth:CodingAgent , auth:AiRawAdvice .
+auth:CodingAgent owl:disjointWith auth:AiRawAdvice .
